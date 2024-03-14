@@ -8,6 +8,7 @@ export const test = (req, res) => {
   });
 };
 
+//getAlluser
 export const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({}, { password: 0 }); // Exclude the password field from the response
@@ -17,6 +18,7 @@ export const getAllUsers = async (req, res, next) => {
   }
 };
 
+//update
 export const updateUser = async (req, res, next) => {
   if (req.user.id !== req.params.id) {
     return next(errorHandler(401, "You cant update Only your account!"));
@@ -40,6 +42,21 @@ export const updateUser = async (req, res, next) => {
     );
     const { password, ...rest } = updatedUser._doc;
     res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// deleteuser
+
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id) {
+    return next(errorHandler(401, "You Can deleteonly your account!"));
+  }
+
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json("user has beeen deleted");
   } catch (error) {
     next(error);
   }

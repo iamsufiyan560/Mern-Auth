@@ -10,6 +10,9 @@ import {
 import { app } from "../firebase";
 import { useDispatch } from "react-redux";
 import {
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
@@ -83,6 +86,24 @@ const Profile = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data));
+
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error));
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -146,10 +167,15 @@ const Profile = () => {
       </form>
 
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer ">Delete Account</span>
+        <span
+          onClick={handleDeleteAccount}
+          className="text-red-700 cursor-pointer "
+        >
+          Delete Account
+        </span>
         <span className="text-red-700 cursor-pointer "> Sign Out</span>
       </div>
-      <p className="text-red-700 mt-5 ">{error && "something wnet wrong"}</p>
+      <p className="text-red-700 mt-5 ">{error && "something went wrong"}</p>
 
       <p className="text-green-700 mt-5 ">
         {updateSuccess && "User is updated succesfully"}
